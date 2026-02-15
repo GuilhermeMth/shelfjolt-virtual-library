@@ -8,8 +8,71 @@ datasource db {
 }
 
 model User {
+  id           Int        @id @default(autoincrement())
+  email        String     @unique
+  password     String
+  
+  publications Book[]     @relation("UserPublications")
+  myShelf      SaveBook[] @relation("UserShelf")
+  
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@map("users")
+}
+
+model Book {
+  id          Int        @id @default(autoincrement())
+  title       String
+  slug        String     @unique
+  description String?    @db.Text
+  
+  fileUrl     String
+  coverPath   String?
+
+  language    String
+  viewCount   Int        @default(0)
+
+  authorId    Int
+  categoryId  Int
+  published   DateTime   @default(now())
+  
+  author      User       @relation("UserPublications", fields: [authorId], references: [id])
+  category    Category   @relation("BookCategory", fields: [categoryId], references: [id])
+  savedBy     SaveBook[] @relation("BookInShelf")
+  
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([authorId])
+  @@index([categoryId])
+  @@index([title])
+  @@map("books")
+}
+
+model Category {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
+  name      String   @unique
+  
+  books     Book[]   @relation("BookCategory")
+  
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model SaveBook {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  bookId    Int
+
+  user      User     @relation("UserShelf", fields: [userId], references: [id])
+  book      Book     @relation("BookInShelf", fields: [bookId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, bookId])
+  @@map("save_books")
 }

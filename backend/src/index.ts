@@ -1,5 +1,5 @@
 import express from "express"
-import prisma from "./lib/prisma"
+import prisma from "./prisma/prisma"
 
 const app = express()
 app.use(express.json())
