@@ -11,10 +11,12 @@
     "moduleResolution": "bundler",
     "target": "ES2023",
     "types": [],
+
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
     // and npm install -D @types/node
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
 
     // Other Outputs
     "sourceMap": true,
