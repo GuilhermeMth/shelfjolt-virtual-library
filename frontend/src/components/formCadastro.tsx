@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 export default function formCadastro() {
     const [showPassword, setShowPassword] = useState(false);
@@ -177,7 +178,8 @@ export default function formCadastro() {
                 </button>
 
                 <p className="text-center text-sm text-gray-400">
-                    Ja Tem Uma Conta? <span className="text-[#8B5E66] cursor-pointer hover:underline">Log In</span>
+                    Ja Tem Uma Conta?{""}
+                    <Link to="/login"className="text-[#8B5E66] cursor-pointer hover:underline">Log In</Link>
                 </p>
             </form>
         </div>
