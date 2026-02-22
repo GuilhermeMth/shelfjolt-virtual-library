@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../firebase";
+import { login } from "../services/auth.service";
+import { setToken } from "../Functions/Storage";
 
 export default function FormLogin() {
   const navigate = useNavigate();
@@ -23,35 +25,19 @@ export default function FormLogin() {
     event.preventDefault();
     setError(null);
     setSuccess(null);
-
     setIsSubmitting(true);
     try {
-      const response = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: form.email,
-          password: form.password,
-        }),
+      const { data } = await login({
+        email: form.email,
+        password: form.password,
       });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        setError(data?.error ?? "Erro ao entrar");
-        return;
-      }
-
       if (data?.access_token) {
-        localStorage.setItem("access_token", data.access_token);
+        setToken(data.access_token);
       }
-
       setSuccess("Login realizado com sucesso");
       setTimeout(() => navigate("/"), 1500);
-    } catch {
-      setError("Nao foi possivel conectar ao servidor");
+    } catch (err: any) {
+      setError(err?.message || "Erro ao entrar");
     } finally {
       setIsSubmitting(false);
     }
@@ -66,7 +52,7 @@ export default function FormLogin() {
       const result = await signInWithPopup(auth, provider);
       const token = await result.user.getIdToken();
 
-      localStorage.setItem("access_token", token);
+      setToken(token);
       setSuccess("Login com Google realizado com sucesso");
       setTimeout(() => navigate("/"), 1500);
     } catch {
@@ -129,7 +115,13 @@ export default function FormLogin() {
                     stroke="currentColor"
                     strokeWidth="1.5"
                   />
-                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
                   <path
                     d="M4 4L20 20"
                     stroke="currentColor"
@@ -150,7 +142,13 @@ export default function FormLogin() {
                     stroke="currentColor"
                     strokeWidth="1.5"
                   />
-                  <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="3"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
                 </svg>
               )}
             </button>
@@ -158,7 +156,9 @@ export default function FormLogin() {
         </div>
 
         {error ? (
-          <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>
+          <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">
+            {error}
+          </p>
         ) : null}
         {success ? (
           <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
@@ -188,10 +188,7 @@ export default function FormLogin() {
         </button>
         <p className="text-center text-sm text-gray-400">
           Ainda não tem uma conta?{" "}
-          <Link
-            to="/cadastro"
-            className="text-[#8B5E66] hover:underline"
-          >
+          <Link to="/cadastro" className="text-[#8B5E66] hover:underline">
             Cadastre-se
           </Link>
         </p>
