@@ -1,23 +1,104 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../firebase";
 
 export default function formCadastro() {
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [form, setForm] = useState({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+    });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { id, value } = event.target;
+        setForm((current) => ({ ...current, [id]: value }));
+    };
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        setError(null);
+        setSuccess(null);
+
+        if (form.password !== form.confirmPassword) {
+            setError("As senhas nao conferem");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            const response = await fetch("http://localhost:3000/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: form.email,
+                    password: form.password,
+                }),
+            });
+
+            const data = await response.json().catch(() => null);
+
+            if (!response.ok) {
+                setError(data?.error ?? "Erro ao cadastrar");
+                return;
+            }
+
+            if (data?.access_token) {
+                localStorage.setItem("access_token", data.access_token);
+            }
+
+            setSuccess("Conta criada com sucesso");
+            setTimeout(() => navigate("/login"), 1500);
+        } catch {
+            setError("Nao foi possivel conectar ao servidor");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleGoogleSignup = async () => {
+        setError(null);
+        setSuccess(null);
+        setIsSubmitting(true);
+
+        try {
+            const result = await signInWithPopup(auth, provider);
+            const token = await result.user.getIdToken();
+
+            localStorage.setItem("access_token", token);
+            setSuccess("Conta criada com Google com sucesso");
+            setTimeout(() => navigate("/login"), 1500);
+        } catch {
+            setError("Erro ao cadastrar com Google");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     return (
         <div className="bg-white rounded-3xl shadow-md px-10 py-10 mb-10 max-w-md mx-auto mt-8">
             <h2 className="text-3xl font-semibold text-gray-800">Cadastrar</h2>
 
-            <form className="mt-8 space-y-5">
+            <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
                 <div className="space-y-4">
-                    <label htmlFor="name">
+                    <label className="text-sm text-gray-700" htmlFor="name">
                         Nome
                     </label>
                     <input
                         id="name"
                         type="text"
                         placeholder="Insira seu nome"
+                        value={form.name}
+                        onChange={handleChange}
                         className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
                     />
                 </div>
@@ -29,6 +110,8 @@ export default function formCadastro() {
                         id="email"
                         type="email"
                         placeholder="ShelfJolt@gmail.com"
+                        value={form.email}
+                        onChange={handleChange}
                         className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
                     />
                 </div>
@@ -45,6 +128,8 @@ export default function formCadastro() {
                             id="password"
                             type={showPassword ? "text" : "password"}
                             placeholder="Insira Sua Senha"
+                            value={form.password}
+                            onChange={handleChange}
                             className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 pr-12 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
                         />
                         <button
@@ -108,6 +193,8 @@ export default function formCadastro() {
                             id="confirmPassword"
                             type={showConfirmPassword ? "text" : "password"}
                             placeholder="Confirme Sua Senha"
+                            value={form.confirmPassword}
+                            onChange={handleChange}
                             className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 pr-12 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
                         />
                         <button
@@ -158,16 +245,28 @@ export default function formCadastro() {
                     </div>
                 </div>
 
+                {error ? (
+                    <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</p>
+                ) : null}
+                {success ? (
+                    <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                        {success}
+                    </p>
+                ) : null}
+
                 <button
                     type="submit"
-                    className="w-full rounded-xl bg-[#8B5E66] py-3 font-semibold text-white cursor-pointer hover:bg-[#7A4C53] transition"
+                    className="w-full rounded-xl bg-[#8B5E66] py-3 font-semibold text-white cursor-pointer hover:bg-[#7A4C53] transition disabled:cursor-not-allowed disabled:opacity-70"
+                    disabled={isSubmitting}
                 >
-                    Criar Conta
+                    {isSubmitting ? "Enviando..." : "Criar Conta"}
                 </button>
 
                 <button
                     type="button"
-                    className="w-full rounded-xl border border-gray-100 bg-[#FBF7F2] py-3 font-semibold text-[#8B5E66] cursor-pointer hover:bg-[#E8E0D7] transition"
+                    onClick={handleGoogleSignup}
+                    className="w-full rounded-xl border border-gray-100 bg-[#FBF7F2] py-3 font-semibold text-[#8B5E66] cursor-pointer hover:bg-[#E8E0D7] transition disabled:cursor-not-allowed disabled:opacity-70"
+                    disabled={isSubmitting}
                 >
                     <span className="inline-flex items-center gap-2">
                         <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white">
