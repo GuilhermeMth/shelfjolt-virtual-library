@@ -191,7 +191,11 @@ export default function FormLogin() {
         >
           <span className="inline-flex items-center gap-2">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white">
-              <img src="/src/assets/google-logo.svg" alt="Google logo" className="h-5 w-5" />
+              <img
+                src="/src/assets/google-logo.svg"
+                alt="Google logo"
+                className="h-5 w-5"
+              />
             </span>
             Continue com o Google
           </span>
