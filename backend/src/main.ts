@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { initializeFirebaseAdmin } from "./providers/firebaseAdmin";
-import serviceAccount from "./serviceAccount.json";
+import serviceAccount from "../serviceAccount.json";
 import express from "express";
 import cors from "cors";
 import router from "./routes";

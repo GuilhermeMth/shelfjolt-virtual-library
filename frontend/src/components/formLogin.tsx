@@ -34,6 +34,8 @@ export default function FormLogin() {
       });
       if (data?.access_token) {
         setToken(data.access_token);
+        navigate("/protegida");
+        return;
       }
       setSuccess("Login realizado com sucesso");
       setTimeout(() => navigate("/"), 1500);
@@ -56,6 +58,8 @@ export default function FormLogin() {
       const data = await authenticateWithFirebase(token);
       if (data && data.access_token) {
         setToken(data.access_token);
+        navigate("/protegida");
+        return;
       }
       setSuccess("Login com Google realizado com sucesso");
       setTimeout(() => navigate("/"), 1500);
@@ -67,10 +71,12 @@ export default function FormLogin() {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-md px-10 py-10 mb-10 max-w-md mx-auto mt-8">
-      <h2 className="text-3xl font-semibold text-gray-800">Entrar</h2>
+    <div className="bg-white rounded-2xl shadow-lg px-8 py-8 mb-8 max-w-md mx-auto mt-12 border border-[#E8E0D7]">
+      <h2 className="text-2xl font-bold text-[#8B5E66] mb-6 tracking-tight">
+        Entrar
+      </h2>
 
-      <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+      <form className="mt-2 space-y-5" onSubmit={handleSubmit}>
         <div className="space-y-2">
           <label className="text-sm text-gray-700" htmlFor="email">
             E-mail
@@ -81,7 +87,7 @@ export default function FormLogin() {
             placeholder="seuemail@gmail.com"
             value={form.email}
             onChange={handleChange}
-            className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
+            className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 text-base outline-none focus:ring-2 focus:ring-[#D8B69A]/40 bg-[#FBF7F2]"
           />
         </div>
 
@@ -97,7 +103,7 @@ export default function FormLogin() {
               placeholder="Insira sua senha"
               value={form.password}
               onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 pr-12 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
+              className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 pr-12 text-base outline-none focus:ring-2 focus:ring-[#D8B69A]/40 bg-[#FBF7F2]"
             />
             <button
               type="button"
@@ -172,7 +178,7 @@ export default function FormLogin() {
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-[#8B5E66] py-3 font-semibold text-white cursor-pointer hover:bg-[#7A4C53] transition disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full rounded-xl bg-[#8B5E66] py-3 font-semibold text-white text-base cursor-pointer hover:bg-[#7A4C53] transition disabled:cursor-not-allowed disabled:opacity-70 shadow-sm"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Enviando..." : "Entrar"}
@@ -180,19 +186,22 @@ export default function FormLogin() {
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="w-full rounded-xl border border-gray-100 bg-[#FBF7F2] py-3 font-semibold text-[#8B5E66] cursor-pointer hover:bg-[#E8E0D7] transition disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full rounded-xl border border-gray-100 bg-[#FBF7F2] py-3 font-semibold text-[#8B5E66] text-base cursor-pointer hover:bg-[#E8E0D7] transition disabled:cursor-not-allowed disabled:opacity-70 shadow-sm"
           disabled={isSubmitting}
         >
           <span className="inline-flex items-center gap-2">
             <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white">
-              G
+              <img src="/src/assets/google-logo.svg" alt="Google logo" className="h-5 w-5" />
             </span>
             Continue com o Google
           </span>
         </button>
-        <p className="text-center text-sm text-gray-400">
+        <p className="text-center text-xs text-gray-400 mt-4">
           Ainda não tem uma conta?{" "}
-          <Link to="/cadastro" className="text-[#8B5E66] hover:underline">
+          <Link
+            to="/cadastro"
+            className="text-[#8B5E66] hover:underline font-medium"
+          >
             Cadastre-se
           </Link>
         </p>

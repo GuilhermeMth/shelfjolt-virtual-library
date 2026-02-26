@@ -74,11 +74,13 @@ export default function FormCadastro() {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-md px-10 py-10 mb-10 max-w-md mx-auto mt-8">
-      <h2 className="text-3xl font-semibold text-gray-800">Cadastrar</h2>
+    <div className="bg-white rounded-2xl shadow-lg px-8 py-5 mb-6 max-w-md mx-auto mt-10 border border-[#E8E0D7]">
+      <h2 className="text-2xl font-bold text-[#8B5E66] mb-4 tracking-tight">
+        Cadastrar
+      </h2>
 
-      <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
-        <div className="space-y-2">
+      <form className="mt-1 space-y-3" onSubmit={handleSubmit}>
+        <div className="space-y-1">
           <label className="text-sm text-gray-700" htmlFor="name">
             Nome
           </label>
@@ -88,11 +90,11 @@ export default function FormCadastro() {
             placeholder="Seu nome completo"
             value={form.name}
             onChange={handleChange}
-            className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
+            className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 text-base outline-none focus:ring-2 focus:ring-[#D8B69A]/40 bg-[#FBF7F2]"
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <label className="text-sm text-gray-700" htmlFor="email">
             Email
           </label>
@@ -102,11 +104,11 @@ export default function FormCadastro() {
             placeholder="ShelfJolt@gmail.com"
             value={form.email}
             onChange={handleChange}
-            className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
+            className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 text-base outline-none focus:ring-2 focus:ring-[#D8B69A]/40 bg-[#FBF7F2]"
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-sm text-gray-700" htmlFor="password">
               Senha
@@ -120,7 +122,7 @@ export default function FormCadastro() {
               placeholder="Insira Sua Senha"
               value={form.password}
               onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 pr-12 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
+              className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 pr-12 text-base outline-none focus:ring-2 focus:ring-[#D8B69A]/40 bg-[#FBF7F2]"
             />
             <button
               type="button"
@@ -182,7 +184,7 @@ export default function FormCadastro() {
           </div>
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-1">
           <div className="flex items-center justify-between">
             <label className="text-sm text-gray-700" htmlFor="confirmPassword">
               Confirmar Senha
@@ -196,7 +198,7 @@ export default function FormCadastro() {
               placeholder="Confirme Sua Senha"
               value={form.confirmPassword}
               onChange={handleChange}
-              className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 pr-12 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
+              className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 pr-12 text-base outline-none focus:ring-2 focus:ring-[#D8B69A]/40 bg-[#FBF7F2]"
             />
             <button
               type="button"
@@ -273,31 +275,17 @@ export default function FormCadastro() {
 
         <button
           type="submit"
-          className="w-full rounded-xl bg-[#8B5E66] py-3 font-semibold text-white cursor-pointer hover:bg-[#7A4C53] transition disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full rounded-xl bg-[#8B5E66] py-2 font-semibold text-white text-base cursor-pointer hover:bg-[#7A4C53] transition disabled:cursor-not-allowed disabled:opacity-70 shadow-sm"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Enviando..." : "Criar Conta"}
         </button>
 
-        <button
-          type="button"
-          onClick={handleGoogleSignup}
-          className="w-full rounded-xl border border-gray-100 bg-[#FBF7F2] py-3 font-semibold text-[#8B5E66] cursor-pointer hover:bg-[#E8E0D7] transition disabled:cursor-not-allowed disabled:opacity-70"
-          disabled={isSubmitting}
-        >
-          <span className="inline-flex items-center gap-2">
-            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white">
-              G
-            </span>
-            Continue com o Google
-          </span>
-        </button>
-
-        <p className="text-center text-sm text-gray-400">
-          Ja Tem Uma Conta?{""}
+        <p className="text-center text-xs text-gray-400 mt-2">
+          Já tem uma conta?{" "}
           <Link
             to="/login"
-            className="text-[#8B5E66] cursor-pointer hover:underline"
+            className="text-[#8B5E66] cursor-pointer hover:underline font-medium"
           >
             Log In
           </Link>
