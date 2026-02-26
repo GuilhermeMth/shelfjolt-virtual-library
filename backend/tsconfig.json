@@ -43,7 +43,9 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "ignoreDeprecations": "5.0"
+    "ignoreDeprecations": "5.0",
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "include": ["src", "generated"]
 }

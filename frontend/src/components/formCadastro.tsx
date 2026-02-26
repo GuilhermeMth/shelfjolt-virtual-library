@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from "../firebase";
 import { register } from "../services/auth.service";
+import { authenticateWithFirebase } from "../services/auth.service";
 import { setToken } from "../Functions/Storage";
 
 export default function FormCadastro() {
@@ -10,6 +11,7 @@ export default function FormCadastro() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [form, setForm] = useState({
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -31,6 +33,7 @@ export default function FormCadastro() {
     try {
       const data = await register(
         {
+          name: form.name,
           email: form.email,
           password: form.password,
         },
@@ -56,8 +59,11 @@ export default function FormCadastro() {
     try {
       const result = await signInWithPopup(auth, provider);
       const token = await result.user.getIdToken();
-
-      setToken(token);
+      // Chama o serviço centralizado
+      const data = await authenticateWithFirebase(token);
+      if (data && data.access_token) {
+        setToken(data.access_token);
+      }
       setSuccess("Conta criada com Google com sucesso");
       setTimeout(() => navigate("/login"), 1500);
     } catch {
@@ -72,6 +78,20 @@ export default function FormCadastro() {
       <h2 className="text-3xl font-semibold text-gray-800">Cadastrar</h2>
 
       <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+        <div className="space-y-2">
+          <label className="text-sm text-gray-700" htmlFor="name">
+            Nome
+          </label>
+          <input
+            id="name"
+            type="text"
+            placeholder="Seu nome completo"
+            value={form.name}
+            onChange={handleChange}
+            className="w-full rounded-xl border border-[#D8B69A] px-4 py-3 outline-none focus:ring-2 focus:ring-[#D8B69A]/40"
+          />
+        </div>
+
         <div className="space-y-2">
           <label className="text-sm text-gray-700" htmlFor="email">
             Email

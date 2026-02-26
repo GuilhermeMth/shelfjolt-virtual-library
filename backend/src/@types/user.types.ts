@@ -1,10 +1,20 @@
 export interface User {
   id: number;
+  name: string;
   email: string;
-  password: string;
+  password?: string | null;
+  google_id?: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-export type RegisterDTO = Pick<User, "email" | "password">;
+export interface GoogleUser {
+  google_id: string;
+  name: string;
+  email: string;
+}
+
+export type RegisterDTO = Pick<User, "email" | "name" | "password">;
 
 export type LoginDTO = Pick<User, "email" | "password">;
 
@@ -17,5 +27,6 @@ export interface AuthResponse {
 
 export interface JWTPayload {
   id: number;
+  name: string;
   email: string;
 }

@@ -8,7 +8,7 @@ const firebaseConfig = {
   storageBucket: "shelf-jolt.firebasestorage.app",
   messagingSenderId: "579097190843",
   appId: "1:579097190843:web:39a3676741db1fc16b249e",
-  measurementId: "G-012GFYHNY3"
+  measurementId: "G-012GFYHNY3",
 };
 
 const app = initializeApp(firebaseConfig);

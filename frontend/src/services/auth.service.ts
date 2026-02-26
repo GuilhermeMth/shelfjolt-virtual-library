@@ -1,7 +1,13 @@
 import { api } from "./api";
 import { removeToken } from "../Functions/Storage";
 
-interface authDTO {
+export interface RegisterDTO {
+  name: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginDTO {
   email: string;
   password: string;
 }
@@ -11,7 +17,7 @@ interface authResponse {
   user: any;
 }
 
-export async function register(data: authDTO, confirmPassword: string) {
+export async function register(data: RegisterDTO, confirmPassword: string) {
   const isPasswordEqual = confirmPassword === data.password;
   if (!isPasswordEqual) {
     throw new Error("As senhas não coincidem.");
@@ -23,7 +29,7 @@ export async function register(data: authDTO, confirmPassword: string) {
   return response.data;
 }
 
-export async function login(data: authDTO) {
+export async function login(data: LoginDTO) {
   return api<authResponse>("/auth/login", {
     method: "POST",
     body: JSON.stringify(data),
@@ -32,4 +38,13 @@ export async function login(data: authDTO) {
 
 export async function logout() {
   removeToken();
+}
+
+// Autenticação social com Firebase (login/cadastro)
+export async function authenticateWithFirebase(firebaseToken: string) {
+  const response = await api<authResponse>("/auth/login/firebase", {
+    method: "POST",
+    body: JSON.stringify({ firebaseToken }),
+  });
+  return response.data;
 }

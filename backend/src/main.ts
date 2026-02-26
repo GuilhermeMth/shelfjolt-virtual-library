@@ -1,4 +1,6 @@
 import "dotenv/config";
+import { initializeFirebaseAdmin } from "./providers/firebaseAdmin";
+import serviceAccount from "./serviceAccount.json";
 import express from "express";
 import cors from "cors";
 import router from "./routes";
@@ -7,6 +9,7 @@ const origin = process.env.FRONTEND_URL;
 const port = Number(process.env.API_PORT);
 
 const app = express();
+initializeFirebaseAdmin(serviceAccount);
 app.use(
   cors({
     origin: `${origin}`,
