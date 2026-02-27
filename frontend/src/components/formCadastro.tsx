@@ -1,9 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithPopup } from "firebase/auth";
-import { auth, provider } from "../firebase";
 import { register } from "../services/auth.service";
-import { authenticateWithFirebase } from "../services/auth.service";
 import { setToken } from "../Functions/Storage";
 
 export default function FormCadastro() {
@@ -46,28 +43,6 @@ export default function FormCadastro() {
       setTimeout(() => navigate("/login"), 1500);
     } catch (err: any) {
       setError(err?.message || "Erro ao cadastrar");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleGoogleSignup = async () => {
-    setError(null);
-    setSuccess(null);
-    setIsSubmitting(true);
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const token = await result.user.getIdToken();
-      // Chama o serviço centralizado
-      const data = await authenticateWithFirebase(token);
-      if (data && data.access_token) {
-        setToken(data.access_token);
-      }
-      setSuccess("Conta criada com Google com sucesso");
-      setTimeout(() => navigate("/login"), 1500);
-    } catch {
-      setError("Erro ao cadastrar com Google");
     } finally {
       setIsSubmitting(false);
     }
