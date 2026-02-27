@@ -34,7 +34,7 @@ export default function FormLogin() {
       });
       if (data?.access_token) {
         setToken(data.access_token);
-        navigate("/protegida");
+        navigate("/");
         return;
       }
       setSuccess("Login realizado com sucesso");
@@ -58,7 +58,7 @@ export default function FormLogin() {
       const data = await authenticateWithFirebase(token);
       if (data && data.access_token) {
         setToken(data.access_token);
-        navigate("/protegida");
+        navigate("/");
         return;
       }
       setSuccess("Login com Google realizado com sucesso");
