@@ -1,10 +1,13 @@
-import { MainRoutes } from "./routes.tsx";
+import Footer from "./components/MainFooter";
+import { MainRoutes } from "./routes";
 
-function App() {
-
+export default function App() {
   return (
-      <MainRoutes />
+    <div className="min-h-screen flex flex-col">
+      <main className="flex-grow">
+        <MainRoutes />
+      </main>
+      <Footer />
+    </div>
   );
 }
-
-export default App;
