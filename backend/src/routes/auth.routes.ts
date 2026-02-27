@@ -5,5 +5,6 @@ const authRouter = Router();
 
 authRouter.post("/register", authProvider.register);
 authRouter.post("/login", authProvider.login);
+authRouter.post("/login/firebase", authProvider.loginWithFirebaseToken);
 
 export default authRouter;
