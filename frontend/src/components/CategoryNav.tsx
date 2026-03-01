@@ -21,7 +21,7 @@ const defaultCategories = [
   "Comedia",
   "Fantasia",
 ];
-
+ 
 export default function CategoryNav({
   categories = defaultCategories,
   active,
