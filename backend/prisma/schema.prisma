@@ -24,44 +24,58 @@ model User {
 }
 
 model Book {
-  id          Int        @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   title       String
-  slug        String     @unique
-  description String?    @db.Text
+  slug        String          @unique
+  description String?         @db.Text
   
   fileUrl     String
   coverPath   String?
 
   language    String
-  viewCount   Int        @default(0)
+  viewCount   Int             @default(0)
 
   authorId    Int
-  categoryId  Int
-  published   DateTime   @default(now())
+  published   DateTime        @default(now())
   
-  author      User       @relation("UserPublications", fields: [authorId], references: [id])
-  category    Category   @relation("BookCategory", fields: [categoryId], references: [id])
-  savedBy     SaveBook[] @relation("BookInShelf")
+  author      User            @relation("UserPublications", fields: [authorId], references: [id])
+  categories  BookCategory[]  @relation("BookCategories")
+  savedBy     SaveBook[]      @relation("BookInShelf")
   
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   @@index([authorId])
-  @@index([categoryId])
   @@index([title])
   @@map("books")
 }
 
 model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
+  id        Int            @id @default(autoincrement())
+  name      String         @unique
   
-  books     Book[]   @relation("BookCategory")
+  books     BookCategory[] @relation("CategoryBooks")
   
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
 
   @@map("categories")
+}
+
+model BookCategory {
+  id         Int      @id @default(autoincrement())
+  bookId     Int
+  categoryId Int
+
+  book       Book     @relation("BookCategories", fields: [bookId], references: [id], onDelete: Cascade)
+  category   Category @relation("CategoryBooks", fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime @default(now())
+
+  @@unique([bookId, categoryId])
+  @@index([bookId])
+  @@index([categoryId])
+  @@map("book_categories")
 }
 
 model SaveBook {
