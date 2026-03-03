@@ -1,18 +1,21 @@
 import { Router } from "express";
 import authRouter from "./auth.routes";
-import { AuthMiddleware } from "../middleware/auth.middleware";
+import bookRouter from "./book.routes";
+import categoryRouter from "./category.routes";
+import { protect } from "../middleware/auth.middleware";
 
 const router = Router();
-const authMiddleware = new AuthMiddleware();
 
 router.get("/status", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-router.get("/protected", authMiddleware.handle, (req, res) => {
+router.get("/protected", protect, (req, res) => {
   res.json({ message: "Acesso autorizado!", user: req.user });
 });
 
 router.use("/auth", authRouter);
+router.use("/books", bookRouter);
+router.use("/categories", categoryRouter);
 
 export default router;

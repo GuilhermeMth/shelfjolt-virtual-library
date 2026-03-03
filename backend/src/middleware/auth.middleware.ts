@@ -34,3 +34,6 @@ export class AuthMiddleware {
     }
   };
 }
+
+const authMiddleware = new AuthMiddleware();
+export const protect = authMiddleware.handle;
