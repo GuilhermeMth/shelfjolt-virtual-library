@@ -1,12 +1,13 @@
 import { Router } from "express";
 import { categoryProvider } from "../providers/category.provider";
 import { protect } from "../middleware/auth.middleware";
+import { writeLimiter } from "../middleware/rateLimit.middleware";
 
 const router = Router();
 
-router.post("/", protect, categoryProvider.create);
+router.post("/", protect, writeLimiter, categoryProvider.create);
 router.get("/", categoryProvider.findAll);
-router.put("/:id", protect, categoryProvider.update);
-router.delete("/:id", protect, categoryProvider.delete);
+router.put("/:id", protect, writeLimiter, categoryProvider.update);
+router.delete("/:id", protect, writeLimiter, categoryProvider.delete);
 
 export default router;
