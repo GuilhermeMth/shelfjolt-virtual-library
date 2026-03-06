@@ -131,30 +131,47 @@ export class BookService {
     }
   }
 
-  async getAllBooks(): Promise<BookResponse[]> {
-    const books = await prisma.book.findMany({
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+  async getAllBooks(options?: { page?: number; limit?: number }): Promise<{
+    books: BookResponse[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    const page = options?.page || 1;
+    const limit = options?.limit || 20;
+    const skip = (page - 1) * limit;
+
+    const [books, total] = await Promise.all([
+      prisma.book.findMany({
+        skip,
+        take: limit,
+        orderBy: {
+          published: "desc",
         },
-        categories: {
-          include: {
-            category: {
-              select: {
-                id: true,
-                name: true,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          categories: {
+            include: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
               },
             },
           },
         },
-      },
-    });
+      }),
+      prisma.book.count(),
+    ]);
 
-    return books.map((book) => {
+    const transformedBooks = books.map((book) => {
       const { authorId, ...bookWithoutAuthorId } = book;
 
       return {
@@ -162,6 +179,13 @@ export class BookService {
         categories: book.categories.map((bc) => bc.category),
       };
     });
+
+    return {
+      books: transformedBooks,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
   }
 
   async getBookById(id: number): Promise<BookResponse | null> {
@@ -196,6 +220,17 @@ export class BookService {
       ...bookWithoutAuthorId,
       categories: book.categories.map((bc) => bc.category),
     };
+  }
+
+  async incrementViewCount(id: number): Promise<void> {
+    await prisma.book.update({
+      where: { id },
+      data: {
+        viewCount: {
+          increment: 1,
+        },
+      },
+    });
   }
 
   async updateBook(
@@ -278,6 +313,134 @@ export class BookService {
     return {
       ...bookWithoutAuthorId,
       categories: book.categories.map((bc) => bc.category),
+    };
+  }
+
+  async getCatalog(filters: {
+    search?: string;
+    categories?: number[];
+    language?: string;
+    page?: number;
+    limit?: number;
+    sortBy?: "recent" | "popular" | "title" | "author";
+  }): Promise<{
+    books: BookResponse[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }> {
+    const {
+      search,
+      categories,
+      language,
+      page = 1,
+      limit = 20,
+      sortBy = "recent",
+    } = filters;
+
+    // Build where clause
+    const where: Prisma.BookWhereInput = {
+      ...(search && {
+        OR: [
+          {
+            title: {
+              contains: search,
+              mode: "insensitive" as Prisma.QueryMode,
+            },
+          },
+          {
+            description: {
+              contains: search,
+              mode: "insensitive" as Prisma.QueryMode,
+            },
+          },
+          {
+            author: {
+              name: {
+                contains: search,
+                mode: "insensitive" as Prisma.QueryMode,
+              },
+            },
+          },
+        ],
+      }),
+      ...(categories &&
+        categories.length > 0 && {
+          categories: {
+            some: {
+              categoryId: {
+                in: categories,
+              },
+            },
+          },
+        }),
+      ...(language && { language }),
+    };
+
+    // Build order by
+    let orderBy: Prisma.BookOrderByWithRelationInput = {};
+    switch (sortBy) {
+      case "recent":
+        orderBy = { published: "desc" };
+        break;
+      case "popular":
+        orderBy = { viewCount: "desc" };
+        break;
+      case "title":
+        orderBy = { title: "asc" };
+        break;
+      case "author":
+        orderBy = { author: { name: "asc" } };
+        break;
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+
+    // Execute queries in parallel
+    const [books, total] = await Promise.all([
+      prisma.book.findMany({
+        where,
+        orderBy,
+        skip,
+        take: limit,
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          categories: {
+            include: {
+              category: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      prisma.book.count({ where }),
+    ]);
+
+    // Transform books
+    const transformedBooks: BookResponse[] = books.map((book) => {
+      const { authorId, ...bookWithoutAuthorId } = book;
+      return {
+        ...bookWithoutAuthorId,
+        categories: book.categories.map((bc) => bc.category),
+      };
+    });
+
+    return {
+      books: transformedBooks,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
     };
   }
 }
